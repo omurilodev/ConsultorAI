@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pré-Call — Conte um pouco sobre você</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #fafaf8;
+  --gray: #6b6b6b;
+  --gray-light: #e8e8e4;
+  --gray-soft: #f4f4f0;
+  --accent: #ff4d00;
+  --accent-soft: #fff1ec;
+  --green: #00875a;
+  --green-soft: #e6f4ef;
+  --border: #e0dbd2;
+}
+
+body {
+  font-family: 'Lora', serif;
+  background: var(--gray-soft);
+  color: var(--black);
+  min-height: 100vh;
+  padding: 48px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper { max-width: 640px; margin: 0 auto; }
+
+.header {
+  background: var(--black);
+  border-radius: 16px 16px 0 0;
+  padding: 48px 48px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,77,0,0.15) 0%, transparent 70%);
+}
+
+.header-tag {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  font-size: 15px;
+  color: rgba(250,250,248,0.55);
+  line-height: 1.65;
+  font-family: 'Lora', serif;
+}
+
+.form-body {
+  background: white;
+  padding: 48px;
+  border-radius: 0 0 16px 16px;
+  border: 1px solid var(--border);
+  border-top: none;
+}
+
+.section {
+  margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+.question { margin-bottom: 24px; }
+.question:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+label .opt {
+  font-weight: 400;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+  width: 100%;
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--black);
+  background: var(--gray-soft);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent);
+  background: white;
+}
+
+textarea { min-height: 90px; }
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+
+.radio-group { display: flex; flex-direction: column; gap: 10px; }
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--gray-soft);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--black);
+}
+
+.radio-option:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+.radio-option input[type="radio"] {
+  width: 18px; height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.note {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: var(--black);
+  line-height: 1.6;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.submit-area { margin-top: 40px; text-align: center; }
+
+.submit-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 16px 48px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.submit-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--gray);
+  font-family: 'Syne', sans-serif;
+}
+
+/* POPUP */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+
+.popup-overlay.active { display: flex; }
+
+.popup-box {
+  background: white;
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  animation: popIn 0.25s ease;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.popup-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.popup-icon.success { background: var(--green-soft); }
+.popup-icon.error   { background: var(--accent-soft); }
+
+.popup-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--black);
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.popup-desc {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--gray);
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
+
+.popup-btn {
+  display: inline-block;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.popup-btn.success { background: var(--green); color: white; }
+.popup-btn.error   { background: var(--accent); color: white; }
+.popup-btn:hover   { opacity: 0.88; }
+
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.page-nav-link {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(250,250,248,0.35);
+  padding: 5px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.page-nav-link:hover { color: rgba(250,250,248,0.75); background: rgba(255,255,255,0.06); }
+.page-nav-link.active { color: var(--accent); }
+
+@media (max-width: 600px) {
+  body { padding: 0; }
+  .wrapper { max-width: 100%; }
+  .header { border-radius: 0; padding: 32px 24px 28px; }
+  .form-body { border-radius: 0; padding: 32px 24px; border-left: none; border-right: none; }
+  .header h1 { font-size: 24px; }
+  .submit-btn { width: 100%; padding: 16px; }
+  .popup-box { padding: 36px 24px; margin: 0 4px; }
+  .page-nav { gap: 0; }
+  .page-nav-link { font-size: 10px; padding: 4px 10px; }
+}
+
+@media (max-width: 400px) {
+  .header { padding: 24px 18px 22px; }
+  .form-body { padding: 24px 18px; }
+  .header h1 { font-size: 21px; }
+  .section-title { font-size: 16px; }
+  .popup-box { padding: 28px 18px; }
+  .page-nav-link { font-size: 9px; padding: 3px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-tag">Pré-Call · Diagnóstico</div>
+    <h1>Antes da nossa conversa, me conta um pouco sobre você.</h1>
+    <p>Leva menos de 5 minutos. As respostas me ajudam a chegar preparado e aproveitar ao máximo o tempo da call.</p>
+    <nav class="page-nav">
+      <a href="crm.html" class="page-nav-link">CRM</a>
+      <a href="form.html" class="page-nav-link active">Formulário</a>
+      <a href="script.html" class="page-nav-link">Script</a>
+      <a href="microsolutions.html" class="page-nav-link">Microsoluções</a>
+    </nav>
+  </div>
+
+  <div class="form-body">
+
+    <div class="note">
+      Não existe resposta certa ou errada aqui. Quanto mais honesto você for, mais útil vai ser a nossa conversa.
+    </div>
+
+    <!-- BLOCO 1 -->
+    <div class="section">
+      <div class="section-num">01</div>
+      <div class="section-title">Sobre o seu negócio</div>
+
+      <div class="question">
+        <label>Qual é o seu nome e o nome do seu negócio (ou área de atuação)?</label>
+        <input id="nome" type="text" placeholder="Ex: João Silva — Clínica Odontológica Silva">
+      </div>
+
+      <div class="question">
+        <label>O que você faz, em uma frase? <span class="opt">(Como você explicaria para um amigo)</span></label>
+        <textarea id="o_que_faz" placeholder="Ex: Sou advogado trabalhista e atendo principalmente pequenas empresas na região de Vitória."></textarea>
+      </div>
+
+      <div class="question">
+        <label>Há quanto tempo você está nesse negócio ou área?</label>
+        <select id="tempo_negocio">
+          <option value="" disabled selected>Selecione</option>
+          <option>Menos de 1 ano</option>
+          <option>1 a 3 anos</option>
+          <option>3 a 5 anos</option>
+          <option>Mais de 5 anos</option>
+        </select>
+      </div>
+
+      <div class="question">
+        <label>Quantas pessoas trabalham com você hoje?</label>
+        <select id="equipe">
+          <option value="" disabled selected>Selecione</option>
+          <option>Só eu</option>
+          <option>2 a 5 pessoas</option>
+          <option>6 a 20 pessoas</option>
+          <option>Mais de 20 pessoas</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- BLOCO 2 -->
+    <div class="section">
+      <div class="section-num">02</div>
+      <div class="section-title">O que está travando você</div>
+
+      <div class="question">
+        <label>Qual é a tarefa ou processo que mais te toma tempo hoje — e que você mais odeia fazer?</label>
+        <textarea id="maior_dor" placeholder="Ex: Responder sempre as mesmas perguntas no WhatsApp, montar proposta para cada cliente do zero..."></textarea>
+      </div>
+
+      <div class="question">
+        <label>Se você pudesse eliminar uma coisa da sua rotina amanhã, o que seria?</label>
+        <textarea id="eliminar" placeholder="Seja específico — quanto mais claro, melhor."></textarea>
+      </div>
+
+      <div class="question">
+        <label>Quais ferramentas você usa hoje para gerir o negócio? <span class="opt">(Liste todas que vier na cabeça)</span></label>
+        <textarea id="ferramentas" placeholder="Ex: WhatsApp, Google Sheets, Instagram, Google Agenda, email, caderno..."></textarea>
+      </div>
+
+      <div class="question">
+        <label>Você já tentou resolver algum desses problemas antes? O que aconteceu?</label>
+        <textarea id="tentativas" placeholder="Ex: Tentei usar um CRM mas era complicado demais. Ou: nunca tentei, não sabia por onde começar."></textarea>
+      </div>
+    </div>
+
+    <!-- BLOCO 3 -->
+    <div class="section">
+      <div class="section-num">03</div>
+      <div class="section-title">O que você quer alcançar</div>
+
+      <div class="question">
+        <label>O que você espera que mude no seu negócio depois de usar AI ou automação?</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="objetivo" value="Ganhar tempo — parar de fazer trabalho manual e repetitivo">
+            Ganhar tempo — quero parar de fazer trabalho manual e repetitivo
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="objetivo" value="Escalar — atender mais clientes sem contratar mais">
+            Escalar — quero atender mais clientes sem contratar mais pessoas
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="objetivo" value="Parecer mais profissional — melhorar a experiência do cliente">
+            Parecer mais profissional — quero melhorar a experiência do meu cliente
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="objetivo" value="Ganhar mais — converter mais vendas e reduzir custos">
+            Ganhar mais — quero converter mais vendas e reduzir custos operacionais
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="objetivo" value="Outro — explicarei na call">
+            Outro — vou explicar na call
+          </label>
+        </div>
+      </div>
+
+      <div class="question">
+        <label>O que seria um resultado concreto que faria você falar "valeu a pena"? <span class="opt">(Seja específico)</span></label>
+        <textarea id="resultado_ideal" placeholder="Ex: Não precisar mais responder WhatsApp fora do horário comercial."></textarea>
+      </div>
+    </div>
+
+    <!-- BLOCO 4 -->
+    <div class="section">
+      <div class="section-num">04</div>
+      <div class="section-title">Sua relação com AI hoje</div>
+
+      <div class="question">
+        <label>Você já usa alguma ferramenta de AI no seu trabalho?</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="ai_uso" value="Não uso nada ainda">
+            Não uso nada ainda
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="ai_uso" value="Uso às vezes — ChatGPT ou similar, de forma básica">
+            Uso às vezes — ChatGPT ou algo parecido, mas de forma básica
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="ai_uso" value="Sim, uso com frequência em algumas tarefas">
+            Sim, uso com frequência em algumas tarefas
+          </label>
+        </div>
+      </div>
+
+      <div class="question">
+        <label>Qual é a sua maior dúvida ou receio sobre usar AI no seu negócio? <span class="opt">(Opcional)</span></label>
+        <textarea id="receio" placeholder="Ex: Tenho medo de parecer impessoal com os clientes."></textarea>
+      </div>
+    </div>
+
+    <!-- BLOCO 5 -->
+    <div class="section">
+      <div class="section-num">05</div>
+      <div class="section-title">Só para me organizar</div>
+
+      <div class="question">
+        <label>Qual é o melhor e-mail para te enviar o link e o lembrete da call?</label>
+        <input id="email_cliente" type="email" placeholder="seuemail@exemplo.com">
+      </div>
+
+      <div class="question">
+        <label>WhatsApp <span class="opt">(com DDD)</span></label>
+        <input id="whatsapp" type="text" placeholder="Ex: 27 99999-0000">
+      </div>
+
+      <div class="question">
+        <label>Instagram <span class="opt">(Opcional)</span></label>
+        <input id="instagram" type="text" placeholder="Ex: @seuperfil">
+      </div>
+
+      <div class="question">
+        <label>Tem algo mais que você queira me contar antes da call? <span class="opt">(Opcional)</span></label>
+        <textarea id="extra" placeholder="Qualquer coisa que você achar relevante..."></textarea>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button class="submit-btn" id="submit-btn">Enviar respostas →</button>
+      <p class="submit-note">Você receberá a confirmação da call por e-mail em até 24h.</p>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- POPUP SUCCESS -->
+<div class="popup-overlay" id="popup-success">
+  <div class="popup-box">
+    <div class="popup-icon success">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00875a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="popup-title">Respostas enviadas!</div>
+    <p class="popup-desc">Recebi tudo certinho. Entrarei em contato em até 24h para confirmar a call. Fique de olho no seu e-mail!</p>
+    <button class="popup-btn success" onclick="document.getElementById('popup-success').classList.remove('active')">Perfeito!</button>
+  </div>
+</div>
+
+<!-- POPUP ERROR -->
+<div class="popup-overlay" id="popup-error">
+  <div class="popup-box">
+    <div class="popup-icon error">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff4d00" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="14"/>
+        <circle cx="12" cy="19" r="1" fill="#ff4d00" stroke="none"/>
+      </svg>
+    </div>
+    <div class="popup-title">Algo deu errado</div>
+    <p class="popup-desc">Não consegui enviar suas respostas. Tente novamente ou me mande um WhatsApp direto.</p>
+    <button class="popup-btn error" onclick="document.getElementById('popup-error').classList.remove('active')">Tentar novamente</button>
+  </div>
+</div>
+
+<script>
+  // ─── CONFIGURAÇÃO EMAILJS ───────────────────────────────────────────
+  // 1. Crie conta em https://www.emailjs.com (grátis até 200 emails/mês)
+  // 2. Crie um Email Service (Gmail, Outlook, etc.) e copie o Service ID
+  // 3. Crie um Email Template e copie o Template ID
+  // 4. Copie sua Public Key em Account > API Keys
+  // 5. Substitua os valores abaixo pelos seus
+
+  const EMAILJS_PUBLIC_KEY  = '8AltJ3SWygh5CU_kv';
+  const EMAILJS_SERVICE_ID  = 'service_ko46bbm';
+  const EMAILJS_TEMPLATE_ID = 'template_p4cojii';
+
+  // ─── INICIALIZAÇÃO ──────────────────────────────────────────────────
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  // ─── SUPABASE ───────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://gmmsjktczkyrmkqczsuu.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtbXNqa3Rjemt5cm1rcWN6c3V1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTQ4MjEsImV4cCI6MjA5NTA5MDgyMX0.Gyyv78dII1g8s4PxrWwlud2JD0jh7ybecO20tIgzGu4';
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ─── ENVIO ──────────────────────────────────────────────────────────
+  document.getElementById('submit-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('submit-btn');
+    const successPopup = document.getElementById('popup-success');
+    const errorPopup   = document.getElementById('popup-error');
+
+    // Coleta os dados
+    const dados = {
+      // Bloco 1
+      nome:          document.getElementById('nome').value,
+      o_que_faz:     document.getElementById('o_que_faz').value,
+      tempo_negocio: document.getElementById('tempo_negocio').value,
+      equipe:        document.getElementById('equipe').value,
+      // Bloco 2
+      maior_dor:  document.getElementById('maior_dor').value,
+      eliminar:   document.getElementById('eliminar').value,
+      ferramentas:document.getElementById('ferramentas').value,
+      tentativas: document.getElementById('tentativas').value,
+      // Bloco 3
+      objetivo:       document.querySelector('input[name="objetivo"]:checked')?.value || 'Não respondido',
+      resultado_ideal:document.getElementById('resultado_ideal').value,
+      // Bloco 4
+      ai_uso: document.querySelector('input[name="ai_uso"]:checked')?.value || 'Não respondido',
+      receio: document.getElementById('receio').value,
+      // Bloco 5
+      email_cliente: document.getElementById('email_cliente').value,
+      whatsapp:     document.getElementById('whatsapp').value,
+      instagram:    document.getElementById('instagram').value,
+      extra:         document.getElementById('extra').value,
+    };
+
+    // Validação mínima
+    if (!dados.nome || !dados.email_cliente) {
+      errorPopup.classList.add('active');
+      document.querySelector('#popup-error .popup-desc').textContent = 'Preencha pelo menos seu nome e e-mail antes de enviar.';
+      return;
+    }
+
+    // Envio
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    successPopup.classList.remove('active');
+    errorPopup.classList.remove('active');
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, dados);
+
+      // Enviar para Supabase
+      await _supabase.from('leads').insert({
+        nome:           dados.nome,
+        email:          dados.email_cliente,
+        whatsapp:       dados.whatsapp,
+        instagram:      dados.instagram,
+        o_que_faz:      dados.o_que_faz,
+        tempo_negocio:  dados.tempo_negocio,
+        equipe:         dados.equipe,
+        maior_dor:      dados.maior_dor,
+        eliminar:       dados.eliminar,
+        ferramentas:    dados.ferramentas,
+        tentativas:     dados.tentativas,
+        objetivo:       dados.objetivo,
+        resultado_ideal:dados.resultado_ideal,
+        ai_uso:         dados.ai_uso,
+        receio:         dados.receio,
+        extra:          dados.extra,
+        status:         'lead'
+      });
+
+      successPopup.classList.add('active');
+      btn.textContent = 'Enviado!';
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      errorPopup.classList.add('active');
+      btn.disabled = false;
+      btn.textContent = 'Enviar respostas →';
+    }
+  });
+</script>
+</body>
+</html>

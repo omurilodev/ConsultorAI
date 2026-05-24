@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script — Discovery Call</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #fafaf8;
+  --gray: #6b6b6b;
+  --gray-light: #e8e8e4;
+  --gray-soft: #f4f4f0;
+  --accent: #ff4d00;
+  --accent-soft: #fff1ec;
+  --green: #00875a;
+  --green-soft: #e6f4ef;
+  --blue: #0057ff;
+  --blue-soft: #eef3ff;
+  --yellow-soft: #fffbea;
+  --border: #e0dbd2;
+}
+
+body {
+  font-family: 'Lora', serif;
+  background: var(--gray-soft);
+  color: var(--black);
+  min-height: 100vh;
+  padding: 48px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper { max-width: 720px; margin: 0 auto; }
+
+/* HEADER */
+.header {
+  background: var(--black);
+  border-radius: 16px;
+  padding: 48px 48px 40px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,77,0,0.12) 0%, transparent 70%);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-tag {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.timer-badge {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(250,250,248,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 5px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 14px;
+  color: rgba(250,250,248,0.5);
+  font-family: 'Syne', sans-serif;
+  line-height: 1.65;
+}
+
+/* MINDSET */
+.mindset {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+}
+
+.mindset-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.mindset-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mindset-list li {
+  font-size: 14px;
+  color: #3a3a3a;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+  font-family: 'Syne', sans-serif;
+}
+
+.mindset-list li::before {
+  content: '—';
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* PHASE */
+.phase {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--gray-light);
+  cursor: pointer;
+  user-select: none;
+}
+
+.phase-header:hover { background: var(--gray-soft); }
+
+.phase-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phase-info { flex: 1; }
+
+.phase-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 2px;
+}
+
+.phase-time {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.phase-chevron {
+  font-size: 18px;
+  color: var(--gray);
+  transition: transform 0.2s;
+  font-family: 'Syne', sans-serif;
+}
+
+.phase.open .phase-chevron { transform: rotate(180deg); }
+
+.phase-body {
+  display: none;
+  padding: 24px 28px;
+}
+
+.phase.open .phase-body { display: block; }
+
+/* STEP */
+.step {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.step:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.step-type {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.step-type.fala { color: var(--blue); }
+.step-type.pergunta { color: var(--green); }
+.step-type.atencao { color: var(--accent); }
+.step-type.nota { color: var(--gray); }
+
+.step-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--black);
+}
+
+.step-content.script {
+  background: var(--blue-soft);
+  border-left: 3px solid var(--blue);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-style: italic;
+  color: #1a1a2e;
+}
+
+.step-content.pergunta-box {
+  background: var(--green-soft);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  color: #0d2b1e;
+}
+
+.step-content.atencao-box {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  color: #2a0e00;
+}
+
+.step-content.nota-box {
+  background: var(--yellow-soft);
+  border-left: 3px solid #d4a017;
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  color: #2a1e00;
+  font-size: 14px;
+}
+
+.sub-perguntas {
+  list-style: none;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sub-perguntas li {
+  font-size: 14px;
+  color: #1a3a2a;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-family: 'Syne', sans-serif;
+}
+
+.sub-perguntas li::before {
+  content: '↳';
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* CHECKLIST */
+.check-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--black);
+  background: var(--gray-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.check-item input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.check-item:has(input:checked) {
+  background: var(--green-soft);
+  border-color: rgba(0,135,90,0.3);
+  color: var(--green);
+}
+
+/* NOTAS AREA */
+.notes-area {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+}
+
+.notes-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 16px;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.note-field label {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 6px;
+}
+
+.note-field textarea {
+  width: 100%;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  color: var(--black);
+  background: var(--gray-soft);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+
+.note-field textarea:focus { border-color: var(--accent); background: white; }
+
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.page-nav-link {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(250,250,248,0.35);
+  padding: 5px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.page-nav-link:hover { color: rgba(250,250,248,0.75); background: rgba(255,255,255,0.06); }
+.page-nav-link.active { color: var(--accent); }
+
+@media (max-width: 600px) {
+  body { padding: 16px 12px; }
+  .header { padding: 28px 20px; margin-bottom: 16px; }
+  .header h1 { font-size: 22px; }
+  .header p { font-size: 13px; }
+  .mindset { padding: 18px 16px; margin-bottom: 16px; }
+  .mindset-title { font-size: 10px; margin-bottom: 16px; }
+  .mindset-list { gap: 8px; }
+  .mindset-list li {
+    background: var(--gray-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    gap: 10px;
+  }
+  .mindset-list li::before { margin-top: 2px; flex-shrink: 0; }
+  .phase { margin-bottom: 12px; }
+  .phase-header { padding: 16px 20px; gap: 12px; }
+  .phase-name { font-size: 15px; }
+  .phase-body { padding: 16px 20px; }
+  .step-content.script,
+  .step-content.pergunta-box,
+  .step-content.atencao-box,
+  .step-content.nota-box { padding: 12px 16px; font-size: 14px; }
+  .check-grid, .notes-grid { grid-template-columns: 1fr; }
+  .notes-area { padding: 20px; margin-top: 16px; }
+  .timer-badge { font-size: 11px; padding: 3px 10px; }
+  .page-nav { gap: 0; }
+  .page-nav-link { font-size: 10px; padding: 4px 10px; }
+}
+
+@media (max-width: 400px) {
+  body { padding: 12px 8px; }
+  .header { padding: 20px 16px 18px; }
+  .header h1 { font-size: 19px; }
+  .mindset { padding: 16px 14px; }
+  .phase-header { padding: 14px 16px; }
+  .phase-body { padding: 14px 16px; }
+  .notes-area { padding: 16px; }
+  .page-nav-link { font-size: 9px; padding: 3px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-tag">Script · Discovery Call</div>
+      <div class="timer-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        45–60 min
+      </div>
+    </div>
+    <h1>Roteiro de Discovery Call</h1>
+    <p>Abra antes da call. Siga os blocos em ordem — mas sem rigidez. Deixe a conversa fluir e use isso como guia, não como trilho.</p>
+    <nav class="page-nav">
+      <a href="crm.html" class="page-nav-link">CRM</a>
+      <a href="form.html" class="page-nav-link">Formulário</a>
+      <a href="script.html" class="page-nav-link active">Script</a>
+      <a href="microsolutions.html" class="page-nav-link">Microsoluções</a>
+    </nav>
+  </div>
+
+  <!-- MINDSET -->
+  <div class="mindset">
+    <div class="mindset-title">Mindset antes de entrar</div>
+    <ul class="mindset-list">
+      <li>Você está aqui para <strong>entender</strong>, não para impressionar. Fale menos do que o cliente.</li>
+      <li>A melhor pergunta que você pode fazer é <strong>"me conta mais sobre isso"</strong>. Use sempre.</li>
+      <li>O cliente não sabe o que quer — sabe o que dói. Seu trabalho é traduzir dor em solução.</li>
+      <li>Não prometa nada durante a call. Ouça, anote e apresente a proposta depois com calma.</li>
+    </ul>
+  </div>
+
+  <!-- FASE 1 -->
+  <div class="phase open">
+    <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="phase-num">1</div>
+      <div class="phase-info">
+        <div class="phase-name">Abertura e rapport</div>
+        <div class="phase-time">5 minutos</div>
+      </div>
+      <div class="phase-chevron">›</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <div class="step-type fala">Você fala</div>
+        <div class="step-content script">
+          "Oi [nome], tudo bem? Fico feliz que a gente conseguiu agendar isso. Li o formulário que você preencheu e já tenho uma boa ideia do contexto — mas quero ouvir de você mesmo. Essa call é sua: não tem roteiro fechado, a gente vai onde a conversa pedir. Tudo bem?"
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Pergunta de abertura</div>
+        <div class="step-content pergunta-box">
+          Me conta um pouco sobre você — como você chegou até onde está hoje no seu negócio?
+          <ul class="sub-perguntas">
+            <li>Deixe o cliente falar livremente por 2-3 minutos. Não interrompa.</li>
+            <li>Anote palavras-chave que ele usa — você vai usar as mesmas palavras na proposta.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FASE 2 -->
+  <div class="phase open">
+    <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="phase-num">2</div>
+      <div class="phase-info">
+        <div class="phase-name">Entender o negócio</div>
+        <div class="phase-time">10 minutos</div>
+      </div>
+      <div class="phase-chevron">›</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <div class="step-type pergunta">Operação atual</div>
+        <div class="step-content pergunta-box">
+          Como é o seu dia a dia operacional? Me descreve uma semana típica sua.
+          <ul class="sub-perguntas">
+            <li>Quais tarefas você faz que consomem mais tempo?</li>
+            <li>Quais ferramentas você usa hoje — WhatsApp, planilha, sistema, email?</li>
+            <li>Tem alguma tarefa que você faz manualmente e sente que "deveria ter um jeito melhor"?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Volume e escala</div>
+        <div class="step-content pergunta-box">
+          Quantos clientes ativos você tem hoje? E quantos você conseguiria atender se tivesse mais estrutura?
+          <ul class="sub-perguntas">
+            <li>O que impede você de atender mais hoje — tempo, equipe, processo?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type nota">Nota</div>
+        <div class="step-content nota-box">
+          Fique atento a momentos em que o cliente suspirar, usar palavras como "sempre", "toda semana", "odeio" ou "perco horas". Esses são os pontos de maior dor — aprofunde nesses.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FASE 3 -->
+  <div class="phase open">
+    <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="phase-num">3</div>
+      <div class="phase-info">
+        <div class="phase-name">Escavar a dor</div>
+        <div class="phase-time">15 minutos</div>
+      </div>
+      <div class="phase-chevron">›</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <div class="step-type pergunta">A dor principal</div>
+        <div class="step-content pergunta-box">
+          Se você pudesse resolver só uma coisa no seu negócio nos próximos 30 dias, o que seria?
+          <ul class="sub-perguntas">
+            <li>Por que isso especificamente?</li>
+            <li>Quanto tempo por semana isso te toma hoje, na sua estimativa?</li>
+            <li>O que acontece quando isso não é feito direito?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Tentativas anteriores</div>
+        <div class="step-content pergunta-box">
+          Você já tentou resolver isso de alguma forma? O que você já experimentou?
+          <ul class="sub-perguntas">
+            <li>O que funcionou? O que não funcionou?</li>
+            <li>Por que você acha que não colou?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">O custo da dor</div>
+        <div class="step-content pergunta-box">
+          Quanto tempo ou dinheiro você acha que esse problema está te custando por mês?
+          <ul class="sub-perguntas">
+            <li>Isso te impede de fazer o quê? O que você poderia fazer com esse tempo de volta?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type atencao">Atenção</div>
+        <div class="step-content atencao-box">
+          Se o cliente não souber estimar o custo, ajude: "Se você economizasse 5 horas por semana, o que você faria com elas?" Isso ancora o valor da solução antes de você apresentar qualquer preço.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FASE 4 -->
+  <div class="phase open">
+    <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="phase-num">4</div>
+      <div class="phase-info">
+        <div class="phase-name">Entender o objetivo</div>
+        <div class="phase-time">10 minutos</div>
+      </div>
+      <div class="phase-chevron">›</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <div class="step-type pergunta">O futuro ideal</div>
+        <div class="step-content pergunta-box">
+          Como seria o seu negócio daqui a 6 meses, no cenário ideal?
+          <ul class="sub-perguntas">
+            <li>O que estaria diferente na sua rotina?</li>
+            <li>O que você estaria fazendo que hoje não consegue fazer?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Prioridade e urgência</div>
+        <div class="step-content pergunta-box">
+          Isso é algo que você quer resolver agora, ou está avaliando para mais pra frente?
+          <ul class="sub-perguntas">
+            <li>O que tornaria isso urgente para você?</li>
+            <li>Tem alguma data ou situação que esteja acelerando essa decisão?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Decisão</div>
+        <div class="step-content pergunta-box">
+          Tem mais alguém envolvido nessa decisão, ou é você quem decide?
+          <ul class="sub-perguntas">
+            <li>Se for sócio ou equipe: o que essa pessoa precisaria ver para aprovar?</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FASE 5 -->
+  <div class="phase open">
+    <div class="phase-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="phase-num">5</div>
+      <div class="phase-info">
+        <div class="phase-name">Apresentação breve + próximo passo</div>
+        <div class="phase-time">10 minutos</div>
+      </div>
+      <div class="phase-chevron">›</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <div class="step-type fala">Você fala — validação</div>
+        <div class="step-content script">
+          "Deixa eu te contar o que eu ouvi, para ter certeza que entendi certo. Você [resumo do problema em 2-3 frases usando as palavras dele]. E o que você quer alcançar é [objetivo]. Tô certo?"
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type atencao">Atenção</div>
+        <div class="step-content atencao-box">
+          Não apresente a solução completa agora. Diga apenas que você enxerga caminhos claros e vai montar uma proposta específica para a situação dele. Proposta genérica na hora fecha menos do que proposta personalizada depois.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type fala">Você fala — próximo passo</div>
+        <div class="step-content script">
+          "Com base no que você me contou, eu consigo enxergar [1 ou 2 pontos de solução de forma genérica]. Vou montar uma proposta específica para a sua situação e te mando até [data — máximo 48h]. Nela vai estar o que eu proporia fazer, como funcionaria na prática e o investimento. Funciona assim para você?"
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-type pergunta">Encerramento</div>
+        <div class="step-content pergunta-box">
+          Antes de finalizar — tem alguma pergunta que ficou, ou alguma coisa que você queria ter falado e não falou?
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHECKLIST PÓS-CALL -->
+  <div class="mindset" style="margin-top: 24px;">
+    <div class="mindset-title">Checklist pós-call — faça isso nas próximas 2 horas</div>
+    <div class="check-grid">
+      <label class="check-item"><input type="checkbox"> Anotar as palavras exatas que o cliente usou para descrever a dor</label>
+      <label class="check-item"><input type="checkbox"> Registrar o tamanho do negócio e contexto</label>
+      <label class="check-item"><input type="checkbox"> Anotar qual é a dor principal e secundária</label>
+      <label class="check-item"><input type="checkbox"> Anotar o objetivo final dele</label>
+      <label class="check-item"><input type="checkbox"> Registrar objeções ou medos que surgiram</label>
+      <label class="check-item"><input type="checkbox"> Definir o que vai propor antes de montar a proposta</label>
+      <label class="check-item"><input type="checkbox"> Mandar mensagem agradecendo a call</label>
+      <label class="check-item"><input type="checkbox"> Colocar prazo na agenda para enviar a proposta</label>
+    </div>
+  </div>
+
+  <!-- NOTAS -->
+  <div class="notes-area">
+    <div class="notes-title">Notas da call — [Nome do cliente]</div>
+    <div class="notes-grid">
+      <div class="note-field">
+        <label>Dor principal</label>
+        <textarea placeholder="O que mais dói hoje..."></textarea>
+      </div>
+      <div class="note-field">
+        <label>Objetivo final</label>
+        <textarea placeholder="O que ele quer alcançar..."></textarea>
+      </div>
+      <div class="note-field">
+        <label>Ferramentas que usa hoje</label>
+        <textarea placeholder="WhatsApp, planilha, etc..."></textarea>
+      </div>
+      <div class="note-field">
+        <label>Objeções / medos</label>
+        <textarea placeholder="O que pode travar a decisão..."></textarea>
+      </div>
+      <div class="note-field">
+        <label>Palavras que ele usou</label>
+        <textarea placeholder="Frases exatas para usar na proposta..."></textarea>
+      </div>
+      <div class="note-field">
+        <label>Solução que vou propor</label>
+        <textarea placeholder="Ideia inicial antes de montar a proposta..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.phase-chevron').forEach(el => {
+    el.textContent = '›';
+  });
+  document.querySelectorAll('.phase-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.parentElement;
+      const chevron = header.querySelector('.phase-chevron');
+      phase.classList.toggle('open');
+      chevron.style.transform = phase.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
+    });
+  });
+</script>
+</style>
+</body>
+</html>
